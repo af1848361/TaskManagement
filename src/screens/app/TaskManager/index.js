@@ -34,8 +34,8 @@ export default function Index() {
   } = useHooks();
 
   return (
-    <ScrollViews.WithKeyboardAvoidingView>
-      <Wrapper isMain backgroundColor={colors.appColor1 + 10}>
+    <Wrapper isMain backgroundColor={colors.appColor1 + 10}>
+      <ScrollViews.WithKeyboardAvoidingView>
         <StatusBars.Dark />
         <Spacer isStatusBarHeigt />
         <Spacer isBasic />
@@ -126,8 +126,8 @@ export default function Index() {
             </React.Fragment>
           )}
         </Wrapper>
-      </Wrapper>
-    </ScrollViews.WithKeyboardAvoidingView>
+      </ScrollViews.WithKeyboardAvoidingView>
+    </Wrapper>
   );
 }
 

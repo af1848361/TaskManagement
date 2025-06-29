@@ -7,9 +7,12 @@ import {
 import {navigate} from '../../../../navigation/rootNavigation';
 import {routes} from '../../../../services';
 import {useRoute} from '@react-navigation/native';
-import {updateDoc} from '@react-native-firebase/firestore';
+import {useDispatch} from 'react-redux';
+import {addTask, removeTask, updateTask} from '../../../../store/appSlice';
 
 export function useHooks() {
+  const dispatch = useDispatch();
+
   const [taskValues, setTaskValues] = useState({
     title: '',
     description: '',
@@ -48,41 +51,60 @@ export function useHooks() {
 
   const handleSubmit = async () => {
     const err = handleSettingError();
-    if (!err) {
-      try {
-        setIsLoading(true);
-        if (ItemCameFromParam) {
-          await updateItem({
-            id: ItemCameFromParam?.id,
-            updates: taskValues,
-          }).then(response => {
-            if (response.Success) {
-              setIsLoading(false);
-              setTimeout(() => {
-                navigate(routes.home);
-              }, 500);
-            }
-          });
-        } else {
-          await createItem({data: taskValues}).then(response => {
-            console.log('Got the responce: ', response.Success);
-            if (response.Success) {
-              setIsLoading(false);
-              setTimeout(() => {
-                navigate(routes.home);
-              }, 500);
-            }
-          });
+    if (err) {
+      console.log('Validation Error');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      if (ItemCameFromParam) {
+        const {title, description, status, id} = ItemCameFromParam;
+
+        if (!id) {
+          console.error('Error: Item ID is undefined. Cannot update item.');
+          setIsLoading(false);
+          return;
         }
-      } catch (error) {
-        console.log('Error: >>>>>>>>>', error);
-      } finally {
-        setIsLoading(false);
+
+        if (
+          title === taskValues.title &&
+          description === taskValues.description &&
+          status === taskValues.status
+        ) {
+          setIsLoading(false);
+          setTimeout(() => navigate(routes.home), 500);
+          return;
+        }
+
+        const response = await updateItem({id, updates: taskValues});
+
+        if (response.Success) {
+          dispatch(
+            updateTask({
+              id,
+              updatedTask: taskValues,
+            }),
+          );
+          setIsLoading(false);
+          setTimeout(() => navigate(routes.home), 500);
+        }
+      } else {
+        const response = await createItem({data: taskValues});
+        if (response.Success) {
+          dispatch(addTask(response.data));
+          setIsLoading(false);
+          setTimeout(() => navigate(routes.home), 500);
+        }
       }
-    } else {
-      console.log('Error');
+    } catch (error) {
+      console.log('Error: >>>>>>>>>', error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   const handleDelete = async () => {
     try {
       setIsDelLoading(true);
@@ -90,6 +112,7 @@ export function useHooks() {
         id: ItemCameFromParam?.id,
       }).then(response => {
         if (response.Success) {
+          dispatch(removeTask(ItemCameFromParam?.id));
           setIsDelLoading(false);
           setTimeout(() => {
             navigate(routes.home);

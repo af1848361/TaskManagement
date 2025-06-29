@@ -16,6 +16,7 @@ import {
 } from '../../../components';
 import {useHooks} from './hooks';
 import {
+  appStyles,
   colors,
   fontSizes,
   responsiveHeight,
@@ -70,6 +71,7 @@ export default function Home() {
           );
         }}
         renderItem={({item, index}) => {
+          console.log('PPP?>>>>>>>>', item);
           return item?.title
             .toLowerCase()
             .includes(SearchValue.toLowerCase()) ? (
@@ -135,8 +137,38 @@ const HeaderContent = ({
           placeholder="Search Tasks..."
           placeholderTextColor={'black'}
         />
-        <Wrapper>
-          <Buttons.Colored
+        <Wrapper
+          style={[
+            appStyles.buttonColord,
+            appStyles.ButtonRegular,
+            {
+              height: responsiveHeight(5),
+              width: responsiveWidth(22),
+              borderRadius: responsiveWidth(2),
+              overflow: 'hidden',
+            },
+          ]}>
+          <Wrapper
+            style={{
+              flex: 1,
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            isGradient
+            gradiantColors={[colors.appColor1, '#469EFC']}>
+            <TouchableOpacity onPress={onPress ?? onPress}>
+              <Wrapper flexDirectionRow alignItemsCenter justifyContentCenter>
+                <Icons.WithText
+                  text={'Create'}
+                  iconName={'plus'}
+                  iconSize={responsiveWidth(4)}
+                  tintColor={colors.appBgColor1}
+                />
+              </Wrapper>
+            </TouchableOpacity>
+          </Wrapper>
+          {/* <Buttons.Colored         
             buttonStyle={{
               alignItems: 'center',
               borderRadius: responsiveWidth(2),
@@ -151,7 +183,7 @@ const HeaderContent = ({
             iconSize={16}
             text={'Create'}
             onPress={onPress}
-          />
+          /> */}
         </Wrapper>
       </Wrapper>
       <Spacer />
@@ -278,22 +310,27 @@ const TaskStatus = ({TaskType, onPress}) => {
 
 const TabButton = ({title, onPress, isActive, StatusCount}) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity style={{}} onPress={onPress}>
       <Wrapper
         background1
-        paddingHorizontalSmall
-        paddingVerticalSmall
         style={{
           borderRadius: responsiveWidth(100),
+          overflow: 'hidden',
           backgroundColor: isActive ? colors.appColor1 : colors.appBgColor1,
         }}>
-        <Text isMediumFont={isActive} isSmall isWhite={isActive}>
-          {title == 'All'
-            ? `All (${StatusCount?.Total})`
-            : StatusCount?.[title] > 0
-            ? `${title} (${StatusCount?.[title]})`
-            : title}
-        </Text>
+        <Wrapper
+          isGradient={isActive}
+          gradiantColors={[colors.appColor1, '#469EFC']}>
+          <Wrapper paddingHorizontalSmall paddingVerticalSmall>
+            <Text isMediumFont={isActive} isSmall isWhite={isActive}>
+              {title == 'All'
+                ? `All (${StatusCount?.Total})`
+                : StatusCount?.[title] > 0
+                ? `${title} (${StatusCount?.[title]})`
+                : title}
+            </Text>
+          </Wrapper>
+        </Wrapper>
       </Wrapper>
     </TouchableOpacity>
   );

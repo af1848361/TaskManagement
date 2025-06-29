@@ -26,14 +26,14 @@ export const createItem = async ({data}) => {
     const docRef = await addDoc(tasksCollection, {
       ...data,
       id: '',
-      createdAt: getFirestoreDate(),
+      createdAt: ConvertTimestampToISO({value: getFirestoreDate()}),
     });
 
     await updateDoc(docRef, {
       id: docRef.id,
     });
 
-    return {Success: true};
+    return {Success: true, data: {...data, id: docRef.id}};
   } catch (error) {
     console.error('Error creating item:', error);
     throw error;
@@ -98,4 +98,11 @@ export const searchItemsByTitle = async letter => {
     console.error(`Error searching items starting with "${letter}":`, error);
     throw error;
   }
+};
+
+export const ConvertTimestampToISO = ({value}) => {
+  if (value instanceof Timestamp) {
+    return value.toDate().toISOString();
+  }
+  return value;
 };
